@@ -16,10 +16,10 @@ from scipy.sparse import csr_matrix,hstack,vstack ,csc_matrix
 from sklearn.base import BaseEstimator, ClassifierMixin, RegressorMixin
 from sklearn.base import clone
 from pystacknet.metrics import check_regression_metric, check_classification_metric
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.utils import check_X_y,check_array,check_consistent_length, column_or_1d
 import inspect
-from sklearn.externals.joblib import delayed,Parallel
+from joblib import delayed, Parallel
 import operator
 import time
 from sklearn.preprocessing import LabelEncoder
@@ -148,8 +148,8 @@ verbose	: Integer value higher than zero to allow printing at the console.
 
 class StackNetClassifier(BaseEstimator, ClassifierMixin):
     
-  def __init__(self, models, metric="logloss", folds=3, restacking=False, use_retraining=True, use_proba=True, random_state=12345, n_jobs=1, verbose=0):
-    
+  def __init__(self, models, metric="logloss", folds=3, restacking=False, use_retraining=True, use_proba=True, random_state=12345, n_jobs=1, verbose=0, labels = None, KFoldSplitter = KFold):
+    self.KFoldSplitter = KFoldSplitter
     #check models 
     if type(models) is type(None):
         raise Exception("Models cannot be None. It needs to be a list of sklearn type of models ")
@@ -278,7 +278,7 @@ class StackNetClassifier(BaseEstimator, ClassifierMixin):
         self.n_classes_=len(self.classes_)
         
         if  isinstance(self.folds, int)   :
-             indices=KFold( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(y) 
+             indices=self.KFoldSplitter( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(X=X,y=y) 
              
         else :
             indices=self.folds
@@ -511,7 +511,7 @@ class StackNetClassifier(BaseEstimator, ClassifierMixin):
         self.n_classes_=len(self.classes_)
         
         if  isinstance(self.folds, int)   :
-             indices=KFold( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(y) 
+             indices=self.KFoldSplitter( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(X=X,y=y) 
              
         else :
             indices=self.folds
@@ -1037,7 +1037,7 @@ class StackNetRegressor(BaseEstimator, RegressorMixin):
         
 
         if  isinstance(self.folds, int)   :
-             indices=KFold( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(y) 
+             indices=self.KFoldSplitter( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(X=X,y=y) 
              
         else :
             indices=self.folds
@@ -1244,7 +1244,7 @@ class StackNetRegressor(BaseEstimator, RegressorMixin):
         out_puts=[]
         
         if  isinstance(self.folds, int)   :
-             indices=KFold( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(y) 
+             indices=self.KFoldSplitter( n_splits=self.folds,shuffle=True, random_state=self.random_state).split(X=X,y=y) 
              
         else :
             indices=self.folds

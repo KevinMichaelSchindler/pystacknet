@@ -20,8 +20,8 @@ valid_classification_metrics=["auc","logloss","accuracy","f1","matthews"]
 def auc(y_true, y_pred, sample_weight=None):    
     return roc_auc_score(y_true, y_pred, sample_weight=sample_weight)
 
-def logloss(y_true, y_pred, sample_weight=None):    
-    return log_loss(y_true, y_pred, sample_weight=sample_weight)
+def logloss(y_true, y_pred, sample_weight=None, labels = None):  
+    return log_loss(y_true, y_pred, sample_weight=sample_weight, labels = labels)
 
 def accuracy(y_true, y_pred, sample_weight=None):    
     return accuracy_score(y_true, y_pred, sample_weight=sample_weight)
